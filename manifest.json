@@ -2,7 +2,7 @@
   "name": "Urdu Reader",
   "version": "1.0",
   "description": "Read and Write Urdu in beatiful fonts.",
-  "permissions": ["tabs","activeTab","declarativeContent","storage","http://*/*","https://*/*"],
+  "permissions": ["activeTab","declarativeContent","storage","http://*/*","https://*/*"],
   "background": {
     "scripts": ["background.js"],
     "persistent": false

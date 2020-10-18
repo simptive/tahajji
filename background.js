@@ -11,7 +11,7 @@ function injectFiles(tabId){
   chrome.tabs.executeScript(tabId, { file: 'inject.js', runAt: 'document_end' }, function(results){
     if(chrome.runtime.lastError || !results || !results.length) return;
     if(results[0] == true) // script is loaded already, just check & change font in case
-      chrome.tabs.sendMessage(tabId, {message: "setFont"});
+      chrome.tabs.sendMessage(tabId, {message: "urtextApply"});
     else{
       chrome.tabs.insertCSS(tabId, { file: 'css/fonts.css' });
       chrome.tabs.insertCSS(tabId, { file: 'css/inject.css' });
@@ -21,7 +21,7 @@ function injectFiles(tabId){
 
 chrome.runtime.onInstalled.addListener(function() {
 
-  chrome.storage.sync.set({font: 'jameel-noori-nastaleeq'});
+  chrome.storage.sync.set({active: true, font: 'jameel-noori-nastaleeq'});
 
   chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
     chrome.declarativeContent.onPageChanged.addRules([{

@@ -16,11 +16,13 @@
 	  node.classList.add("urtext-font-"+font);
 	}
 
-	function recursiveFix(node,font){
+	function recursiveApply(node,font){
 		if(node.nodeName == '#text' && isRTL(node.textContent))
 	    setStyle(node.parentNode,font);
+		else if(node.nodeName == 'INPUT' || node.nodeName == 'TEXTAREA')
+			isRTL(node.value) ? setStyle(node,font) : fontClear(node);
 		else
-			[].forEach.call(node.childNodes, function(n){ recursiveFix(n,font); });
+			[].forEach.call(node.childNodes, function(n){ recursiveApply(n,font); });
 	}
 
 	function switchFont(node,font){
@@ -40,40 +42,52 @@
 		return same;
 	}
 
-	function fontFix(node){
-		// On re-installation, this script may get orphan and will throw error on storage request
-		if(chrome.runtime.id == undefined) return;
-		chrome.storage.sync.get('font', function(data){
-			font = data.font;
-			// node isn't an html element (e.g. ajax loaded text)
-			if(typeof node.querySelector == 'undefined') return;
-			let exsNode = node.querySelector("[class*='urtext-font-']");
-			// If an element found with style, check its font before switching, otherwise apply first time
-			if(exsNode){ 
-				if(!sameFont(exsNode,font)) switchFont(node,font); 
-			}else{ recursiveFix(node,font); }
-		});
+	function fontApply(node,font){
+		// node isn't an html element (e.g. ajax loaded text)
+		if(typeof node.querySelector == 'undefined') return;
+		let exsNode = node.querySelector("[class*='urtext-font-']");
+		// If an element found with style, check its font before switching, otherwise apply first time
+		if(exsNode){ 
+			if(!sameFont(exsNode,font)) switchFont(node,font); 
+		}else{ recursiveApply(node,font); }
 	}
 
 	function fontClear(node){
+	  // in case of input & textarea change to LTR or empty, we need parent of 'urtext-parent'
+		if(node.childNodes.length == 0) node = node.closest('div') ? node.closest('div').parentNode : node.parentNode;
+		console.log(node);
 		node.querySelectorAll("[class*='urtext-']").forEach(node => {
 	  	node.className.split(' ').forEach(c => { if(c.search("urtext-") > -1) node.classList.remove(c); });
 		});
 	}
 
+	function actionApply(node){
+		// On re-installation, this script may get orphan and will throw error on storage request
+		if(chrome.runtime.id == undefined) return;
+		chrome.storage.sync.get('active', function(data){
+			if(data.active)
+				chrome.storage.sync.get('font', function(data){ fontApply(node, data.font); });
+			else
+				fontClear(node);
+		});
+	}
+
 	chrome.runtime.onMessage.addListener(function(request, sender){
-	  if(request.message == 'setFont')
-	    fontFix(document);
-	  else if(request.message == 'clearFont')
-	  	fontClear(document);
+	  if(request.message == 'urtextApply') actionApply(document);
 	});
 
 	// for ajax content
   document.addEventListener('DOMNodeInserted', function(event){
-    fontFix(event.target);
+    actionApply(event.target);
   });
 
+  document.querySelectorAll("input,textarea").forEach(input => {
+		input.addEventListener('input', function(event){
+	    actionApply(event.target);
+	  });
+	});
+
   // final call
-  fontFix(document);
+  actionApply(document);
 
 })();

@@ -1,22 +1,53 @@
 <!DOCTYPE html>
 <html>
-  <head></head>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="css/fonts.css" >
+    <link rel="stylesheet" type="text/css" href="css/inject.css" >
+    <link rel="stylesheet" type="text/css" href="css/switch.css" >
+    <style type="text/css">
+      .radio label{ font-size: 16px; }
+    </style>
+  </head>
   <body style="width: 120px;">
-
-    <div class="radio">
-      <label><input type="radio" name="fontSelect" value="jameel-noori-nastaleeq">Noori Nastaleeq</label>
+    
+    <div class="onoffswitch" style="text-align: right;">
+      <label class="toggle">
+        <span class="toggle-label" id="switchActiveLabel" style="font-weight: 700;">Enabled</span>
+        <input class="toggle-checkbox" type="checkbox" id="switchActive" checked>
+        <div class="toggle-switch"></div>
+      </label>
     </div>
-    <div class="radio">
-      <label><input type="radio" name="fontSelect" value="nafees-naskh">Nafees Naskh</label>
-    </div>
-    <div class="radio">
-      <label><input type="radio" name="fontSelect" value="rouqa">Rouqa</label>
-    </div>
-
 
     <hr/>
 
-    <button id="clear" class="">Clear Fonts</button>
+    <div class="radio urtext-parent">
+      <label class="urtext-self urtext-font-jameel-noori-nastaleeq">نوری نستعلیق<input type="radio" name="fontSelect" value="jameel-noori-nastaleeq"></label>
+    </div>
+    <div class="radio urtext-parent">
+      <label class="urtext-self urtext-font-jameel-noori-kasheeda">نستعلیق کشیدہ<input type="radio" name="fontSelect" value="jameel-noori-kasheeda"></label>
+    </div>
+    <div class="radio urtext-parent">
+      <label class="urtext-self urtext-font-nafees-naskh">نفیس نسخ<input type="radio" name="fontSelect" value="nafees-naskh"></label>
+    </div>
+    <div class="radio urtext-parent">
+      <label class="urtext-self urtext-font-rouqa">رقعه یونیکوڈ<input type="radio" name="fontSelect" value="rouqa"></label>
+    </div>
+    <div class="radio urtext-parent">
+      <label class="urtext-self urtext-font-alqalam-shakir">القلم شاکر<input type="radio" name="fontSelect" value="alqalam-shakir"></label>
+    </div>
+    <div class="radio urtext-parent">
+      <label class="urtext-self urtext-font-alqalam-tehreeri">القلم تحریری<input type="radio" name="fontSelect" value="alqalam-tehreeri"></label>
+    </div>
+    <div class="radio urtext-parent">
+      <label class="urtext-self urtext-font-nafees-web-naskh">نفیس ویب نسخ<input type="radio" name="fontSelect" value="nafees-web-naskh"></label>
+    </div>
+    <div class="radio urtext-parent">
+      <label class="urtext-self urtext-font-pdms-bukhari">بخاری<input type="radio" name="fontSelect" value="pdms-bukhari"></label>
+    </div>
+    <div class="radio urtext-parent">
+      <label class="urtext-self urtext-font-pdms-pencil-nafees">پنسل نفیس<input type="radio" name="fontSelect" value="pdms-pencil-nafees"></label>
+    </div>
 
     <script src="popup.js"></script>
   </body>
