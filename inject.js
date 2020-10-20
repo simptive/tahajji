@@ -17,12 +17,19 @@
 	}
 
 	function recursiveApply(node,font){
-		if(node.nodeName == '#text' && isRTL(node.textContent))
-	    setStyle(node.parentNode,font);
-		else if(node.nodeName == 'INPUT' || node.nodeName == 'TEXTAREA')
+		if(node.nodeName == '#text' && isRTL(node.textContent)){
+			// span = document.createElement('span');
+			// span.innerHTML = node.textContent;
+			// node.replaceWith(span);
+			// setStyle(span,font);
+			setStyle(node.parentNode,font);
+		}else if(node.nodeName == 'INPUT' || node.nodeName == 'TEXTAREA'){
 			isRTL(node.value) ? setStyle(node,font) : fontClear(node);
-		else
+		}else if(node == document || (typeof node.className == 'string' && node.className.search('urtext-self') == -1)){
+			// some nodes like svg have object className instead of string
+			// preventing to run on newly created span
 			[].forEach.call(node.childNodes, function(n){ recursiveApply(n,font); });
+		}
 	}
 
 	function switchFont(node,font){
@@ -55,7 +62,6 @@
 	function fontClear(node){
 	  // in case of input & textarea change to LTR or empty, we need parent of 'urtext-parent'
 		if(node.childNodes.length == 0) node = node.closest('div') ? node.closest('div').parentNode : node.parentNode;
-		console.log(node);
 		node.querySelectorAll("[class*='urtext-']").forEach(node => {
 	  	node.className.split(' ').forEach(c => { if(c.search("urtext-") > -1) node.classList.remove(c); });
 		});

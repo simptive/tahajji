@@ -8,13 +8,14 @@
 
 function injectFiles(tabId){
    // script to be inserted at document-end, css at default
-  chrome.tabs.executeScript(tabId, { file: 'inject.js', runAt: 'document_end' }, function(results){
+   // allFrames will handle iframe too
+  chrome.tabs.executeScript(tabId, { file: 'inject.js', runAt: 'document_end', allFrames: true }, function(results){
     if(chrome.runtime.lastError || !results || !results.length) return;
     if(results[0] == true) // script is loaded already, just check & change font in case
       chrome.tabs.sendMessage(tabId, {message: "urtextApply"});
     else{
-      chrome.tabs.insertCSS(tabId, { file: 'css/fonts.css' });
-      chrome.tabs.insertCSS(tabId, { file: 'css/inject.css' });
+      chrome.tabs.insertCSS(tabId, { file: 'css/fonts.css', allFrames: true });
+      chrome.tabs.insertCSS(tabId, { file: 'css/inject.css', allFrames: true });
     }
   });
 }
