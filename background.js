@@ -22,7 +22,7 @@ function injectFiles(tabId){
 
 chrome.runtime.onInstalled.addListener(function() {
 
-  chrome.storage.sync.set({active: true, font: 'jameel-noori-nastaleeq'});
+  chrome.storage.sync.set({active: true, font: 'jameel-noori-nastaleeq', scale: 100 });
 
   chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
     chrome.declarativeContent.onPageChanged.addRules([{

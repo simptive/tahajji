@@ -8,31 +8,46 @@
 	  return intersection.length > 0;
 	};
 
-	function setStyle(node,font){
+	function setSize(node,scale){
+		node.setAttribute('data-urtex-size', scale);
+
+		var xStyle = node.getAttribute('style');
+  	var xSize = parseFloat(window.getComputedStyle(node).fontSize);
+  	//var xSize = parseFloat(window.getComputedStyle(node, null).getPropertyValue('font-size'));
+  	//console.log(scale);
+
+  	var nSize = Math.ceil(scale/100 * xSize);
+  	var urtStyle = ';urt;font-size:'+nSize+'px;urt;';
+  	console.log(nSize);
+  	
+  	if(xStyle && xStyle.match(/;urt;.+;urt;/))
+  		node.setAttribute('style', xStyle.replace(/;urt;.+;urt;/, urtStyle));
+  	else
+  		node.setAttribute('style', xStyle+urtStyle);
+	}
+
+	function setStyle(node,data){
 	  // setting text-align in nearest parent div if available because doesn't work often on other elements
 	  var divParent = node.closest('div') == undefined ? node : node.closest('div');
 	  divParent.classList.add("urtext-parent");
 	  node.classList.add("urtext-self");
-	  node.classList.add("urtext-font-"+font);
+	  node.classList.add("urtext-font-"+data.font);
+	  setSize(node,data.scale);
 	}
 
-	function recursiveApply(node,font){
+	function recursiveApply(node,data){
 		if(node.nodeName == '#text' && isRTL(node.textContent)){
-			// span = document.createElement('span');
-			// span.innerHTML = node.textContent;
-			// node.replaceWith(span);
-			// setStyle(span,font);
-			setStyle(node.parentNode,font);
+			setStyle(node.parentNode,data);
 		}else if(node.nodeName == 'INPUT' || node.nodeName == 'TEXTAREA'){
-			isRTL(node.value) ? setStyle(node,font) : fontClear(node);
+			isRTL(node.value) ? setStyle(node,data) : fontClear(node);
 		}else if(node == document || (typeof node.className == 'string' && node.className.search('urtext-self') == -1)){
 			// some nodes like svg have object className instead of string
 			// preventing to run on newly created span
-			[].forEach.call(node.childNodes, function(n){ recursiveApply(n,font); });
+			[].forEach.call(node.childNodes, function(n){ recursiveApply(n,data); });
 		}
 	}
 
-	function switchFont(node,font){
+	function switchFontAll(node,font){
 		node.querySelectorAll("[class*='urtext-font-']").forEach(element => {
 	  	element.classList.forEach(c => {
 	  		if(c.search("urtext-font") > -1){
@@ -43,20 +58,32 @@
 		});
 	}
 
+	function switchSizeAll(node,scale){
+		node.querySelectorAll("[class*='urtext-font-']").forEach(element => {
+	  	setSize(element);
+		});
+	}
+
 	function sameFont(aNode,font){
 		var same = false;
 		aNode.classList.forEach(c => { if(c == 'urtext-font-'+font) same = true; });
 		return same;
 	}
 
-	function fontApply(node,font){
+	function sameSize(aNode,scale){
+		let xScale = aNode.getAttribute('data-urtext-size');
+		return xScale ? parseInt(xScale) === scale : scale === 100;
+	}
+
+	function fontApply(node,data){
 		// node isn't an html element (e.g. ajax loaded text)
 		if(typeof node.querySelector == 'undefined') return;
 		let exsNode = node.querySelector("[class*='urtext-font-']");
 		// If an element found with style, check its font before switching, otherwise apply first time
 		if(exsNode){ 
-			if(!sameFont(exsNode,font)) switchFont(node,font); 
-		}else{ recursiveApply(node,font); }
+			if(!sameFont(exsNode,data.font)) switchFontAll(node,data.font);
+			if(!sameSize(exsNode,data.scale)) switchSizeAll(node,data.scale);
+		}else{ recursiveApply(node,data); }
 	}
 
 	function fontClear(node){
@@ -70,11 +97,8 @@
 	function actionApply(node){
 		// On re-installation, this script may get orphan and will throw error on storage request
 		if(chrome.runtime.id == undefined) return;
-		chrome.storage.sync.get('active', function(data){
-			if(data.active)
-				chrome.storage.sync.get('font', function(data){ fontApply(node, data.font); });
-			else
-				fontClear(node);
+		chrome.storage.sync.get(['active','font','scale'], function(data){
+			data.active ? fontApply(node, data) : fontClear(node);
 		});
 	}
 

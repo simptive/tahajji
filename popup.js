@@ -12,6 +12,20 @@ var changeFont = function(event) {
   });
 };
 
+var changeFontSize = function(step){
+  var value = parseInt(document.getElementById('fs-number').value.replace('%',''), 10);
+  value = isNaN(value) ? 100 : value;
+  value+=step;
+  if(step > 0 && value > 150) value = 150;
+  if(step < 0 && value < 50) value = 50;
+  document.getElementById('fs-number').value = value+'%';
+
+  chrome.storage.sync.set({scale: value});
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, {message: "urtextApply"});
+  });
+}
+
 document.querySelectorAll('input[name="fontSelect"]').forEach(radio => {
 	radio.addEventListener('change', changeFont);
 });
@@ -25,13 +39,20 @@ document.getElementById('switchActive').addEventListener('change', function(even
 });
 
 window.addEventListener('load', function(event){
-	chrome.storage.sync.get('active', function(data) {
+	chrome.storage.sync.get(['active','font','scale'], function(data) {
 		document.getElementById('switchActive').checked = data.active;
 		document.getElementById('switchActiveLabel').textContent = data.active ? 'Enabled' : 'Disabled';
+    document.getElementsByName('fontSelect').forEach(radio => {
+      if(radio.value == data.font) radio.setAttribute('checked','');
+    });
+    document.getElementById('fs-number').value = data.scale+'%';
 	});
-  chrome.storage.sync.get('font', function(data) {
-	  document.getElementsByName('fontSelect').forEach(radio => {
-			if(radio.value == data.font) radio.setAttribute('checked','');
-		});
-	});
+});
+
+document.getElementById('fs-increase').addEventListener('click', function(event){
+  changeFontSize(5);
+});
+
+document.getElementById('fs-decrease').addEventListener('click', function(event){
+  changeFontSize(-5);
 });
