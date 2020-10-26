@@ -1,4 +1,4 @@
-div.font-size {
+div.font-size, div.line-height {
   text-align: right;
 }
 
@@ -24,17 +24,17 @@ div.font-size {
   cursor: pointer;
 }
 
-#fs-decrease {
+.value-button.minus {
   margin-right: -4px;
   border-radius: 8px 0 0 8px;
 }
 
-#fs-increase {
+.value-button.plus {
   margin-left: -4px;
   border-radius: 0 8px 8px 0;
 }
 
-#fs-number {
+#fs-number, #lh-number {
   text-align: center;
   border: none;
   border-top: 1px solid #ddd;

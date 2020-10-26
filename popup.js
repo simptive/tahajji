@@ -20,7 +20,21 @@ var changeFontSize = function(step){
   if(step < 0 && value < 50) value = 50;
   document.getElementById('fs-number').value = value+'%';
 
-  chrome.storage.sync.set({scale: value});
+  chrome.storage.sync.set({fontScale: value});
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, {message: "urtextApply"});
+  });
+}
+
+var changeLineHeight = function(step){
+  var value = parseInt(document.getElementById('lh-number').value.replace('%',''), 10);
+  value = isNaN(value) ? 100 : value;
+  value+=step;
+  if(step > 0 && value > 150) value = 150;
+  if(step < 0 && value < 50) value = 50;
+  document.getElementById('lh-number').value = value+'%';
+
+  chrome.storage.sync.set({lineScale: value});
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {message: "urtextApply"});
   });
@@ -39,13 +53,14 @@ document.getElementById('switchActive').addEventListener('change', function(even
 });
 
 window.addEventListener('load', function(event){
-	chrome.storage.sync.get(['active','font','scale'], function(data) {
+	chrome.storage.sync.get(['active','font','fontScale','lineScale'], function(data) {
 		document.getElementById('switchActive').checked = data.active;
 		document.getElementById('switchActiveLabel').textContent = data.active ? 'Enabled' : 'Disabled';
     document.getElementsByName('fontSelect').forEach(radio => {
       if(radio.value == data.font) radio.setAttribute('checked','');
     });
-    document.getElementById('fs-number').value = data.scale+'%';
+    document.getElementById('fs-number').value = data.fontScale+'%';
+    document.getElementById('lh-number').value = data.lineScale+'%';
 	});
 });
 
@@ -55,4 +70,12 @@ document.getElementById('fs-increase').addEventListener('click', function(event)
 
 document.getElementById('fs-decrease').addEventListener('click', function(event){
   changeFontSize(-5);
+});
+
+document.getElementById('lh-increase').addEventListener('click', function(event){
+  changeLineHeight(5);
+});
+
+document.getElementById('lh-decrease').addEventListener('click', function(event){
+  changeLineHeight(-5);
 });

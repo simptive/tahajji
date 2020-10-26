@@ -10,7 +10,7 @@
       .radio label{ font-size: 16px; }
     </style>
   </head>
-  <body style="width: 150px;">
+  <body style="width: 160px;">
     
     <div class="onoffswitch" style="text-align: right;">
       <label class="toggle">
@@ -24,11 +24,20 @@
     
     <div class="font-size">
       Font Size:
-      <div class="value-button" id="fs-decrease">-</div>
+      <div class="value-button minus" id="fs-decrease">-</div>
       <input type="text" id="fs-number" value="100%" disabled="disabled" />
-      <div class="value-button" id="fs-increase">+</div>
+      <div class="value-button plus" id="fs-increase">+</div>
     </div>
     
+    <hr/>
+    
+    <div class="line-height">
+      Line Height:
+      <div class="value-button minus" id="lh-decrease">-</div>
+      <input type="text" id="lh-number" value="100%" disabled="disabled" />
+      <div class="value-button plus" id="lh-increase">+</div>
+    </div>
+
     <hr/>
 
     <div class="radio urtext-parent">

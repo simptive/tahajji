@@ -8,22 +8,21 @@
 	  return intersection.length > 0;
 	};
 
-	function setSize(node,scale){
-		node.setAttribute('data-urtex-size', scale);
+	function applyScaling(node,data){
+		if(!data.fontScale) return;
+		node.setAttribute('data-urtext-fontscale', data.fontScale);
+		var xStyle = node.getAttribute('style') || '';
+		node.setAttribute('style', xStyle.replace(/;urt;.+;urt;/, ''));
 
-		var xStyle = node.getAttribute('style');
   	var xSize = parseFloat(window.getComputedStyle(node).fontSize);
-  	//var xSize = parseFloat(window.getComputedStyle(node, null).getPropertyValue('font-size'));
-  	//console.log(scale);
+  	var xHeight = parseFloat(window.getComputedStyle(node).lineHeight);
 
-  	var nSize = Math.ceil(scale/100 * xSize);
-  	var urtStyle = ';urt;font-size:'+nSize+'px;urt;';
-  	console.log(nSize);
+  	var nSize = Math.round(data.fontScale/100 * xSize);
+  	var nHeight = Math.round(data.lineScale/100 * xHeight);
+  	var urtStyle = ';urt;font-size:'+nSize+'px;line-height:'+nHeight+'px;urt;';
   	
-  	if(xStyle && xStyle.match(/;urt;.+;urt;/))
-  		node.setAttribute('style', xStyle.replace(/;urt;.+;urt;/, urtStyle));
-  	else
-  		node.setAttribute('style', xStyle+urtStyle);
+  	xStyle = node.getAttribute('style');
+  	node.setAttribute('style', xStyle+urtStyle);
 	}
 
 	function setStyle(node,data){
@@ -32,13 +31,13 @@
 	  divParent.classList.add("urtext-parent");
 	  node.classList.add("urtext-self");
 	  node.classList.add("urtext-font-"+data.font);
-	  setSize(node,data.scale);
+	  applyScaling(node,data);
 	}
 
 	function recursiveApply(node,data){
 		if(node.nodeName == '#text' && isRTL(node.textContent)){
 			setStyle(node.parentNode,data);
-		}else if(node.nodeName == 'INPUT' || node.nodeName == 'TEXTAREA'){
+		}else if((node.nodeName == 'INPUT' || node.nodeName == 'TEXTAREA') && node.type !== 'hidden'){
 			isRTL(node.value) ? setStyle(node,data) : fontClear(node);
 		}else if(node == document || (typeof node.className == 'string' && node.className.search('urtext-self') == -1)){
 			// some nodes like svg have object className instead of string
@@ -58,9 +57,9 @@
 		});
 	}
 
-	function switchSizeAll(node,scale){
+	function switchScalingAll(node,data){
 		node.querySelectorAll("[class*='urtext-font-']").forEach(element => {
-	  	setSize(element);
+	  	applyScaling(element, data);
 		});
 	}
 
@@ -70,45 +69,54 @@
 		return same;
 	}
 
-	function sameSize(aNode,scale){
-		let xScale = aNode.getAttribute('data-urtext-size');
-		return xScale ? parseInt(xScale) === scale : scale === 100;
+	function sameScaling(aNode,data){
+		let fontScale = parseInt(aNode.getAttribute('data-urtext-fontscale') || 0);
+		let lineScale = parseInt(aNode.getAttribute('data-urtext-linescale') || 0);
+		return fontScale === data.fontScale && lineScale === data.lineScale;
 	}
 
 	function fontApply(node,data){
-		// node isn't an html element (e.g. ajax loaded text)
-		if(typeof node.querySelector == 'undefined') return;
 		let exsNode = node.querySelector("[class*='urtext-font-']");
 		// If an element found with style, check its font before switching, otherwise apply first time
-		if(exsNode){ 
+		if(exsNode){			
 			if(!sameFont(exsNode,data.font)) switchFontAll(node,data.font);
-			if(!sameSize(exsNode,data.scale)) switchSizeAll(node,data.scale);
+			if(!sameScaling(exsNode,data)) switchScalingAll(node,data);
 		}else{ recursiveApply(node,data); }
 	}
 
 	function fontClear(node){
-	  // in case of input & textarea change to LTR or empty, we need parent of 'urtext-parent'
+		// in case of input & textarea change to LTR or empty, we need parent of 'urtext-parent'
 		if(node.childNodes.length == 0) node = node.closest('div') ? node.closest('div').parentNode : node.parentNode;
 		node.querySelectorAll("[class*='urtext-']").forEach(node => {
 	  	node.className.split(' ').forEach(c => { if(c.search("urtext-") > -1) node.classList.remove(c); });
+	  	let xStyle = node.getAttribute('style') || '';
+	  	node.setAttribute('style', xStyle.replace(/;urt;.+;urt;/, ''));
+	  	node.removeAttribute('data-urtext-fontscale');
+	  	node.removeAttribute('data-urtext-linescale');
 		});
 	}
 
 	function actionApply(node){
-		// On re-installation, this script may get orphan and will throw error on storage request
-		if(chrome.runtime.id == undefined) return;
-		chrome.storage.sync.get(['active','font','scale'], function(data){
+		// 1. On re-installation, this script may get orphan and will throw error 
+		// 		on storage request, checking runtime will save fatal error.
+		// 2.	Check if node isn't an html element (e.g. ajax loaded text, SVG)
+		if(chrome.runtime.id == undefined ||
+			['IMG','IFRAME','SCRIPT','LINK'].indexOf(node.nodeName) > -1 ||
+			typeof node.querySelector == 'undefined') return;
+		if(node.nodeName == '#document') node = document.body;
+		if(node.nodeName == 'BODY') console.log('Applying on Full body');
+		chrome.storage.sync.get(['active','font','fontScale','lineScale'], function(data){
 			data.active ? fontApply(node, data) : fontClear(node);
 		});
 	}
 
 	chrome.runtime.onMessage.addListener(function(request, sender){
-	  if(request.message == 'urtextApply') actionApply(document);
+		if(request.message == 'urtextApply') actionApply(document);
 	});
 
 	// for ajax content
   document.addEventListener('DOMNodeInserted', function(event){
-    actionApply(event.target);
+  	actionApply(event.target);
   });
 
   document.querySelectorAll("input,textarea").forEach(input => {
@@ -118,6 +126,6 @@
 	});
 
   // final call
-  actionApply(document);
+  actionApply(document.body);
 
 })();

@@ -22,7 +22,7 @@ function injectFiles(tabId){
 
 chrome.runtime.onInstalled.addListener(function() {
 
-  chrome.storage.sync.set({active: true, font: 'jameel-noori-nastaleeq', scale: 100 });
+  chrome.storage.sync.set({active: true, font: 'jameel-noori-nastaleeq', fontScale: 100, lineScale: 100 });
 
   chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
     chrome.declarativeContent.onPageChanged.addRules([{
@@ -36,8 +36,8 @@ chrome.runtime.onInstalled.addListener(function() {
 
 });
 
-chrome.tabs.onUpdated.addListener(function(tabId) {
-  injectFiles(tabId);
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+  if(changeInfo.status === 'complete') injectFiles(tabId);
 });
 
 chrome.tabs.onActivated.addListener(function(activeInfo) {
