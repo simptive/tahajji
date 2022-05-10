@@ -8,7 +8,7 @@ var changeFont = function(event) {
 	let font = document.querySelector('input[name="fontSelect"]:checked').value;
 	chrome.storage.sync.set({font: font});
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, {message: "urtextApply"});
+    chrome.tabs.sendMessage(tabs[0].id, {message: "urtextApply"}, (response) => {});
   });
 };
 
@@ -22,7 +22,7 @@ var changeFontSize = function(step){
 
   chrome.storage.sync.set({fontScale: value});
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, {message: "urtextApply"});
+    chrome.tabs.sendMessage(tabs[0].id, {message: "urtextApply"}, (response) => {});
   });
 }
 
@@ -36,7 +36,7 @@ var changeLineHeight = function(step){
 
   chrome.storage.sync.set({lineScale: value});
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, {message: "urtextApply"});
+    chrome.tabs.sendMessage(tabs[0].id, {message: "urtextApply"}, (response) => {});
   });
 }
 
@@ -48,7 +48,7 @@ document.getElementById('switchActive').addEventListener('change', function(even
 	document.getElementById('switchActiveLabel').textContent = event.target.checked ? 'Enabled' : 'Disabled'
 	chrome.storage.sync.set({active: event.target.checked});
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, {message: "urtextApply"});
+    chrome.tabs.sendMessage(tabs[0].id, {message: "urtextApply"}, (response) => {});
   });
 });
 

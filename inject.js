@@ -110,8 +110,11 @@
 		});
 	}
 
-	chrome.runtime.onMessage.addListener(function(request, sender){
-		if(request.message == 'urtextApply') actionApply(document);
+	chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+		if(request.message == 'urtextApply'){
+			actionApply(document);
+			sendResponse({success: true});
+		}
 	});
 
 	// for ajax content

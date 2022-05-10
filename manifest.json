@@ -1,13 +1,14 @@
 {
+  "manifest_version": 3,
   "name": "Urdu Reader",
   "version": "1.0",
   "description": "Read and Write Urdu in beatiful fonts.",
-  "permissions": ["activeTab","declarativeContent","storage","http://*/*","https://*/*"],
-  "background": {
-    "scripts": ["background.js"],
-    "persistent": false
+  "permissions": [ "activeTab","declarativeContent","storage", "scripting" ],
+  "host_permissions": [ "<all_urls>" ],
+  "background" : {
+    "service_worker": "background.js"
   },
-  "page_action": {
+  "action": {
     "default_name": "Urdu Reader",
     "default_popup": "popup.html",
     "default_icon": {
@@ -24,6 +25,8 @@
     "128": "images/get_started128.png"
   },
   "options_page": "options.html",
-  "manifest_version": 2,
-  "web_accessible_resources": [ "*.woff2" ]
+  "web_accessible_resources": [{
+    "resources": ["*.woff2", "*.ttf"],
+    "matches": ["<all_urls>"]
+  }]
 }
