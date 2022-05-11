@@ -2,6 +2,8 @@
 	if(window.hasRun) return true;
   window.hasRun = true;
 
+  var containerTags = ['DIV','SPAN','P','B','I','U','STRONG','LI','EM','TD','A','H1','H2','H3','H4','H5','H6'];
+
 	function isRTL(str){           
 	  var urArray = ["ا", "ب", "ج", "د", "ن", "ی"]
 	  var intersection = urArray.filter(value => str.split('').includes(value));
@@ -25,9 +27,16 @@
   	node.setAttribute('style', xStyle+urtStyle);
 	}
 
+	function getParent(node){
+		var divParent = node.parentElement;
+		if(divParent == undefined || !containerTags.includes(node.parentElement.tagName))
+			divParent = node; //self
+		return divParent;
+	}
+
 	function setStyle(node,data){
-	  // setting text-align in nearest parent div if available because doesn't work often on other elements
-	  var divParent = node.closest('div') == undefined ? node : node.closest('div');
+	  // setting text-align in nearest parent
+	  var divParent = getParent(node);
 	  divParent.classList.add("urtext-parent");
 	  node.classList.add("urtext-self");
 	  node.classList.add("urtext-font-"+data.font);
@@ -86,7 +95,7 @@
 
 	function fontClear(node){
 		// in case of input & textarea change to LTR or empty, we need parent of 'urtext-parent'
-		if(node.childNodes.length == 0) node = node.closest('div') ? node.closest('div').parentNode : node.parentNode;
+		if(node.childNodes.length == 0) node = getParent(node).parentNode;
 		node.querySelectorAll("[class*='urtext-']").forEach(node => {
 	  	node.className.split(' ').forEach(c => { if(c.search("urtext-") > -1) node.classList.remove(c); });
 	  	let xStyle = node.getAttribute('style') || '';
