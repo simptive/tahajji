@@ -125,11 +125,14 @@
 			sendResponse({success: true});
 		}
 	});
-
-	// for ajax content
-  document.addEventListener('DOMNodeInserted', function(event){
-  	actionApply(event.target);
-  });
+	
+	var observer = new MutationObserver(function(mutations) {
+		mutations.forEach(function(mutation) {
+			for (var i = 0; i < mutation.addedNodes.length; i++)
+				actionApply(mutation.addedNodes[i]);
+		})
+	});
+	observer.observe(document.documentElement, { childList: true, subtree: true });
 
   document.querySelectorAll("input,textarea").forEach(input => {
 		input.addEventListener('input', function(event){
