@@ -96,6 +96,7 @@
 	function fontClear(node){
 		// in case of input & textarea change to LTR or empty, we need parent of 'urtext-parent'
 		if(node.childNodes.length == 0) node = getParent(node).parentNode;
+		if(node == undefined) return;
 		node.querySelectorAll("[class*='urtext-']").forEach(node => {
 	  	node.className.split(' ').forEach(c => { if(c.search("urtext-") > -1) node.classList.remove(c); });
 	  	let xStyle = node.getAttribute('style') || '';
@@ -109,11 +110,11 @@
 		// 1. On re-installation, this script may get orphan and will throw error 
 		// 		on storage request, checking runtime will save fatal error.
 		// 2.	Check if node isn't an html element (e.g. ajax loaded text, SVG)
-		if(chrome.runtime.id == undefined ||
+		if(chrome.runtime == undefined || chrome.runtime.id == undefined ||
 			['IMG','IFRAME','SCRIPT','LINK'].indexOf(node.nodeName) > -1 ||
 			typeof node.querySelector == 'undefined') return;
 		if(node.nodeName == '#document') node = document.body;
-		if(node.nodeName == 'BODY') console.log('Applying on Full body');
+		//if(node.nodeName == 'BODY') console.log('Applying on Full body');
 		chrome.storage.sync.get(['active','font','fontScale','lineScale'], function(data){
 			data.active ? fontApply(node, data) : fontClear(node);
 		});
