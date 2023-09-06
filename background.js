@@ -24,19 +24,7 @@ function injectFiles(tabId){
 }
 
 chrome.runtime.onInstalled.addListener(function() {
-
   chrome.storage.sync.set({active: true, font: 'mehr_nastaliq_web', fontScale: 100, lineScale: 100 });
-
-  chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-    chrome.declarativeContent.onPageChanged.addRules([{
-        conditions: [
-          new chrome.declarativeContent.PageStateMatcher({
-            pageUrl: { urlMatches: '.*' },
-          })
-        ], actions: [ new chrome.declarativeContent.ShowPageAction() ]}
-    ]);
-  });
-
 });
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
