@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Urdu Reader",
+  "name": "Tahajji - Urdu Reader",
   "version": "1.1",
   "description": "Read and Write Urdu in beatiful fonts.",
   "permissions": [ "storage", "scripting" ],
