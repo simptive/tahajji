@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Urdu Reader",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Read and Write Urdu in beatiful fonts.",
   "permissions": [ "storage", "scripting" ],
   "host_permissions": [ "<all_urls>" ],
