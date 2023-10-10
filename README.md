@@ -29,7 +29,12 @@ Urdu Reader is an open-source browser extension designed to enhance the reading 
 * Only global settings, it can't save different setting for each website.
 
 ## Setting up the project:
+
 Clone the repostitory and open as a project in your favorite editor. Open Chrome, go to Options > Extensions > Manage Extensions > Load Unpacked and select working directory.
+
+## License:
+
+Released under the [MIT License](https://opensource.org/license/mit/).
 
 ## Contributions:
 
